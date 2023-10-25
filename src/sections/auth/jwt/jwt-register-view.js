@@ -16,6 +16,8 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 import { useSearchParams, useRouter } from 'src/routes/hooks';
+// assets
+import { EmailInboxIcon } from 'src/assets/icons';
 // config
 import { PATH_AFTER_LOGIN } from 'src/config-global';
 // auth
@@ -42,6 +44,8 @@ export default function JwtRegisterView() {
 
   const [invitingUser, setInvitingUser] = useState('');
   const [inviting, setInviting] = useState(false);
+
+  const [registerSucceed, setRegisterSucceed] = useState(false);
 
   const searchParams = useSearchParams();
 
@@ -77,6 +81,7 @@ export default function JwtRegisterView() {
   const onSubmit = handleSubmit(async (data) => {
     try {
       console.log(data);
+      console.log(inviting);
       // await register?.(data.email, data.password, data.firstName, data.lastName);
       // router.push(returnTo || PATH_AFTER_LOGIN);
 
@@ -85,7 +90,7 @@ export default function JwtRegisterView() {
       formData.append('password', data.password);
       formData.append('firstname', data.firstName);
       formData.append('lastname', data.lastName);
-      formData.append('inviting', inviting);
+      formData.append('inviting', inviting ? paramName : inviting);
 
       const apiUrl = 'http://194.233.175.49/api/v2/account/register';
       axios
@@ -98,8 +103,10 @@ export default function JwtRegisterView() {
           // Handle a successful login
           console.log('Sign up successful:', response.data);
           enqueueSnackbar(response.data.message);
-          const href = paths.auth.jwt.login;
-          router.replace(href);
+          // const href = paths.auth.jwt.login;
+          // router.replace(href);
+          setRegisterSucceed(true);
+
           // You can redirect the user or perform other actions here
           // register?.(data.email, data.password, data.firstName, data.lastName);
           // router.push(returnTo || PATH_AFTER_LOGIN);
@@ -142,6 +149,8 @@ export default function JwtRegisterView() {
       console.error(error);
     }
   }, [paramName]);
+
+  useEffect(() => {}, []);
 
   const renderHead = (
     <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
@@ -222,11 +231,23 @@ export default function JwtRegisterView() {
     </FormProvider>
   );
 
+  const renderSuccess = (
+    <>
+      <EmailInboxIcon sx={{ height: 96 }} />
+
+      <Stack spacing={1} sx={{ my: 5 }}>
+        <Typography variant="h4" sx={{ maxWidth: 480, textAlign: 'center' }}>
+          Please check your email!
+        </Typography>
+      </Stack>
+    </>
+  );
+
   return (
     <>
       {renderHead}
 
-      {renderForm}
+      {registerSucceed ? renderSuccess : renderForm}
 
       {/* {renderTerms} */}
     </>
