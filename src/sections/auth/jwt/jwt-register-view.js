@@ -114,11 +114,16 @@ export default function JwtRegisterView() {
         .catch((error) => {
           // Handle login failure or errors
           console.error('Sign up failed:', error);
+          if (error.response !== undefined) {
+            setErrorMsg(error.response.data.message);
+          } else {
+            setErrorMsg(typeof error === 'string' ? error : error.message);
+          }
         });
     } catch (error) {
       console.error(error);
-      reset();
-      setErrorMsg(typeof error === 'string' ? error : error.message);
+      // reset();
+      // setErrorMsg(typeof error === 'string' ? error : error.message);
     }
   });
 
