@@ -119,24 +119,26 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/user/${MOCK_ID}/edit`,
       },
     },
-    product: {
-      root: `${ROOTS.DASHBOARD}/product`,
-      new: `${ROOTS.DASHBOARD}/product/new`,
-      details: (id) => `${ROOTS.DASHBOARD}/product/${id}`,
-      edit: (id) => `${ROOTS.DASHBOARD}/product/${id}/edit`,
+    wallet: {
+      root: `${ROOTS.DASHBOARD}/wallet`,
+      list: `${ROOTS.DASHBOARD}/wallet/list`,
+      new: `${ROOTS.DASHBOARD}/wallet/new`,
+      details: (id) => `${ROOTS.DASHBOARD}/wallet/${id}`,
+      edit: (id) => `${ROOTS.DASHBOARD}/wallet/${id}/edit`,
       demo: {
-        details: `${ROOTS.DASHBOARD}/product/${MOCK_ID}`,
-        edit: `${ROOTS.DASHBOARD}/product/${MOCK_ID}/edit`,
+        details: `${ROOTS.DASHBOARD}/wallet/${MOCK_ID}`,
+        edit: `${ROOTS.DASHBOARD}/wallet/${MOCK_ID}/edit`,
       },
     },
-    invoice: {
-      root: `${ROOTS.DASHBOARD}/invoice`,
-      new: `${ROOTS.DASHBOARD}/invoice/new`,
-      details: (id) => `${ROOTS.DASHBOARD}/invoice/${id}`,
-      edit: (id) => `${ROOTS.DASHBOARD}/invoice/${id}/edit`,
+    spent: {
+      root: `${ROOTS.DASHBOARD}/spent`,
+      list: `${ROOTS.DASHBOARD}/spent/list`,
+      new: `${ROOTS.DASHBOARD}/spent/new`,
+      details: (id) => `${ROOTS.DASHBOARD}/spent/${id}`,
+      edit: (id) => `${ROOTS.DASHBOARD}/spent/${id}/edit`,
       demo: {
-        details: `${ROOTS.DASHBOARD}/invoice/${MOCK_ID}`,
-        edit: `${ROOTS.DASHBOARD}/invoice/${MOCK_ID}/edit`,
+        details: `${ROOTS.DASHBOARD}/spent/${MOCK_ID}`,
+        edit: `${ROOTS.DASHBOARD}/spent/${MOCK_ID}/edit`,
       },
     },
     post: {
@@ -149,11 +151,12 @@ export const paths = {
         edit: `${ROOTS.DASHBOARD}/post/${paramCase(MOCK_TITLE)}/edit`,
       },
     },
-    order: {
-      root: `${ROOTS.DASHBOARD}/order`,
-      details: (id) => `${ROOTS.DASHBOARD}/order/${id}`,
+    credit: {
+      root: `${ROOTS.DASHBOARD}/credit`,
+      list: `${ROOTS.DASHBOARD}/credit/list`,
+      details: (id) => `${ROOTS.DASHBOARD}/credit/${id}`,
       demo: {
-        details: `${ROOTS.DASHBOARD}/order/${MOCK_ID}`,
+        details: `${ROOTS.DASHBOARD}/credit/${MOCK_ID}`,
       },
     },
     job: {

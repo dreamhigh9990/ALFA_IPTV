@@ -23,6 +23,7 @@ import { useAuthContext } from 'src/auth/hooks';
 // components
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import axios from 'axios'; // Import Axios
 
 // ----------------------------------------------------------------------
 
@@ -45,8 +46,10 @@ export default function JwtLoginView() {
   });
 
   const defaultValues = {
-    email: 'demo@minimals.cc',
-    password: 'demo1234',
+    // email: 'demo@minimals.cc',
+    // password: 'demo1234',
+    email: '',
+    password: '',
   };
 
   const methods = useForm({
@@ -61,20 +64,44 @@ export default function JwtLoginView() {
   } = methods;
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      await login?.(data.email, data.password);
+    console.log(data);
+    const formData = new URLSearchParams();
+    formData.append('email', data.email);
+    formData.append('password', data.password);
 
-      router.push(returnTo || PATH_AFTER_LOGIN);
-    } catch (error) {
-      console.error(error);
-      reset();
-      setErrorMsg(typeof error === 'string' ? error : error.message);
-    }
+    const apiUrl = 'http://194.233.175.49/api/v2/account/login';
+    axios
+      .post(apiUrl, formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .then((response) => {
+        // Handle a successful login
+        console.log('Login successful:', response.status);
+        // console.log('response', response);
+
+        const nt = { ...response.data, email: data.email };
+
+        login?.(nt);
+        router.push(returnTo || PATH_AFTER_LOGIN);
+      })
+      .catch((error) => {
+        // Handle login failure or errors
+        // reset();
+        console.log('Login failed:', error);
+
+        if (error.response !== undefined) {
+          setErrorMsg(error.response.data.message);
+        } else {
+          setErrorMsg(typeof error === 'string' ? error : error.message);
+        }
+      });
   });
 
   const renderHead = (
     <Stack spacing={2} sx={{ mb: 5 }}>
-      <Typography variant="h4">Sign in to Minimal</Typography>
+      <Typography variant="h4">Sign in to ALFA</Typography>
 
       <Stack direction="row" spacing={0.5}>
         <Typography variant="body2">New user?</Typography>
@@ -128,9 +155,9 @@ export default function JwtLoginView() {
     <FormProvider methods={methods} onSubmit={onSubmit}>
       {renderHead}
 
-      <Alert severity="info" sx={{ mb: 3 }}>
+      {/* <Alert severity="info" sx={{ mb: 3 }}>
         Use email : <strong>demo@minimals.cc</strong> / password :<strong> demo1234</strong>
-      </Alert>
+      </Alert> */}
 
       {renderForm}
     </FormProvider>

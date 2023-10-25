@@ -97,7 +97,7 @@ export const dashboardRoutes = [
         ],
       },
       {
-        path: 'product',
+        path: 'wallet',
         children: [
           { element: <ProductListPage />, index: true },
           { path: 'list', element: <ProductListPage /> },
@@ -107,7 +107,7 @@ export const dashboardRoutes = [
         ],
       },
       {
-        path: 'order',
+        path: 'credit',
         children: [
           { element: <OrderListPage />, index: true },
           { path: 'list', element: <OrderListPage /> },
@@ -115,7 +115,7 @@ export const dashboardRoutes = [
         ],
       },
       {
-        path: 'invoice',
+        path: 'spent',
         children: [
           { element: <InvoiceListPage />, index: true },
           { path: 'list', element: <InvoiceListPage /> },

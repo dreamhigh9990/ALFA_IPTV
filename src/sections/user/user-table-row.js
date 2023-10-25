@@ -9,6 +9,7 @@ import Checkbox from '@mui/material/Checkbox';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
+import LinearProgress from '@mui/material/LinearProgress';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // components
@@ -22,7 +23,18 @@ import UserQuickEditForm from './user-quick-edit-form';
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({ row, selected, onEditRow, onSelectRow, onDeleteRow }) {
-  const { name, avatarUrl, company, role, status, email, phoneNumber } = row;
+  const {
+    name,
+    avatarUrl,
+    username,
+    password,
+    notes,
+    created_at,
+    exp_date,
+    exp_percent,
+    exp_subtitle,
+    status,
+  } = row;
 
   const confirm = useBoolean();
 
@@ -33,7 +45,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
   return (
     <>
       <TableRow hover selected={selected}>
-        <TableCell padding="checkbox">
+        {/* <TableCell padding="checkbox">
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
@@ -81,12 +93,57 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
           <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
+        </TableCell> */}
+
+        <TableCell padding="checkbox">
+          <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
+        <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+          <Avatar alt={name} src={avatarUrl} sx={{ mr: 2 }} />
+
+          <ListItemText
+            primary={name}
+            primaryTypographyProps={{ typography: 'body2' }}
+            secondaryTypographyProps={{
+              component: 'span',
+              color: 'text.disabled',
+            }}
+          />
+        </TableCell>
+
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{username}</TableCell>
+
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{password}</TableCell>
+
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{created_at}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {/* <LinearProgress
+            value={(available * 100) / quantity}
+            variant="determinate"
+            color={
+              (inventoryType === 'out of stock' && 'error') ||
+              (inventoryType === 'low stock' && 'warning') ||
+              'success'
+            }
+            sx={{ mb: 1, height: 6, maxWidth: 80 }}
+          />
+          {!!available && available} {inventoryType} */}
+
+          <LinearProgress
+            value={exp_percent}
+            variant="determinate"
+            color={exp_percent > 50 ? 'success' : 'warning'}
+            sx={{ mb: 1, height: 6, maxWidth: 80 }}
+          />
+
+          {exp_subtitle}
+        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{notes}</TableCell>
       </TableRow>
 
       <UserQuickEditForm currentUser={row} open={quickEdit.value} onClose={quickEdit.onFalse} />
 
-      <CustomPopover
+      {/* <CustomPopover
         open={popover.open}
         onClose={popover.onClose}
         arrow="right-top"
@@ -112,9 +169,9 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
           <Iconify icon="solar:pen-bold" />
           Edit
         </MenuItem>
-      </CustomPopover>
+      </CustomPopover> */}
 
-      <ConfirmDialog
+      {/* <ConfirmDialog
         open={confirm.value}
         onClose={confirm.onFalse}
         title="Delete"
@@ -124,7 +181,7 @@ export default function UserTableRow({ row, selected, onEditRow, onSelectRow, on
             Delete
           </Button>
         }
-      />
+      /> */}
     </>
   );
 }

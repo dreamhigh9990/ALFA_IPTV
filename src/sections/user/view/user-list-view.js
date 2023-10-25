@@ -1,5 +1,7 @@
 import isEqual from 'lodash/isEqual';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import axios from 'axios';
+
 // @mui
 import { alpha } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
@@ -48,11 +50,11 @@ const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...USER_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name' },
-  { id: 'phoneNumber', label: 'Phone Number', width: 180 },
-  { id: 'company', label: 'Company', width: 220 },
-  { id: 'role', label: 'Role', width: 180 },
-  { id: 'status', label: 'Status', width: 100 },
-  { id: '', width: 88 },
+  { id: 'username', label: 'Username', width: 280 },
+  { id: 'password', label: 'Password', width: 250 },
+  { id: 'creat_At', label: 'Create At', width: 220 },
+  { id: 'expries', label: 'Expries', width: 220 },
+  { id: 'notes', label: 'Notes', width: 220 },
 ];
 
 const defaultFilters = {
@@ -72,7 +74,8 @@ export default function UserListView() {
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_userList);
+  // const [tableData, setTableData] = useState(_userList);
+  const [tableData, setTableData] = useState([]);
 
   const [filters, setFilters] = useState(defaultFilters);
 
@@ -143,6 +146,32 @@ export default function UserListView() {
     setFilters(defaultFilters);
   }, []);
 
+  useEffect(() => {
+    // const authToken =
+    //   'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyX2lkIjoiMSIsInVzZXJfaXAiOiIyMTMuMTQuMTkyLjIwMiIsImVtYWlsIjoiZGVtb3VzZXJAZ21haWwuY29tIiwiand0X2V4cGlyZSI6MTY5NzY3MTQ4Nn0.CkFq8VOTIQ9btY0ryOE__UGnEO6WSlo_S0L6g_ImojnNOyCrAZDHGdJ_E6p68suqJ7D1lIoa2veM0dV4nh1FEC3Qx5HaXPon90nrKR15x743LbAjp7aIvDjFDGoA9u8mSRvW7fZozX-XkS3p6QGPwfLlpyii6HNjLGHBfEWWq6PkE1eQVbEfEHxUnDjvEW3f4C_1I-L2zdzd2B_Ont2WW9idAXmeaZQl2AFlqf19iDb2_eOIuP_TJWjN_DJLPgSMliFwMdILLu8560soTFADibPYHM041Or5kJdJHcioddOBPmv1bFx2c5C0bqj6G0NTAgde5rYtspgP95T8DPK_zNHdMnYEBxL7zPJXTwIkpvoeTc4t3xoSEomyJZeq1lVmb92Xx-7Mkp8BicnIT-9WpuSGhZTrU8qks2uiu5LWL3wbS0RlNSm9v0FkQAaGKNo1r5q3iUI82ZyEPfX9uVZD0iummxCL3emenOQPuKAKTwfS3ISp8Tt9VKDslliRICPd7i-KXq0IZ8vmwTcijUIAhxwaUb3Gyu9yF3s6eejjmKon8_nMC0X6GJjqEZsdSIQaE6I4Txs1LMiY0BtM6Z_modOIxh1YdH1_xUggjKkI4FY8RJEHGrRR9CfeWd48WZzKwELKKFT45VHizNOCw0Cfbo-Je_a0wmWso8Q91ranrLw';
+
+    const authToken = sessionStorage.getItem('accessToken');
+
+    axios
+      .get('http://194.233.175.49/api/v2/account/profiles/list', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', // Adjust this based on your API's requirement
+          Authorization: authToken,
+        },
+      })
+      .then((response) => {
+        // Perform actions based on the response here
+        console.log('Get Users', response.data);
+        const arrary = response.data;
+        const ttt = arrary?.map((t) => ({ ...t, id: t.username }));
+        setTableData(ttt);
+      })
+      .catch((error) => {
+        // Handle login failure or errors
+        console.error('Get Users failed:', error);
+      });
+  }, []);
+
   return (
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
@@ -169,7 +198,7 @@ export default function UserListView() {
         />
 
         <Card>
-          <Tabs
+          {/* <Tabs
             value={filters.status}
             onChange={handleFilterStatus}
             sx={{
@@ -209,7 +238,7 @@ export default function UserListView() {
                 }
               />
             ))}
-          </Tabs>
+          </Tabs> */}
 
           <UserTableToolbar
             filters={filters}

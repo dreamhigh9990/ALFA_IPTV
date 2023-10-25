@@ -95,7 +95,15 @@ const authJwt = {
     {
       path: 'register',
       element: (
-        <AuthClassicLayout title="Manage the job more effectively with Minimal">
+        <AuthClassicLayout title="Manage ALFA accounts with ease">
+          <JwtRegisterPage />
+        </AuthClassicLayout>
+      ),
+    },
+    {
+      path: 'register/:paramName',
+      element: (
+        <AuthClassicLayout title="Manage ALFA accounts with ease">
           <JwtRegisterPage />
         </AuthClassicLayout>
       ),

@@ -1,132 +1,118 @@
 import PropTypes from 'prop-types';
-import { format } from 'date-fns';
 // @mui
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
-import LinearProgress from '@mui/material/LinearProgress';
-// utils
-import { fCurrency } from 'src/utils/format-number';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // components
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
-import { ConfirmDialog } from 'src/components/custom-dialog';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
+import { ConfirmDialog } from 'src/components/custom-dialog';
+//
+import UserQuickEditForm from '../user/user-quick-edit-form';
 
 // ----------------------------------------------------------------------
 
-export default function ProductTableRow({
-  row,
-  selected,
-  onSelectRow,
-  onDeleteRow,
-  onEditRow,
-  onViewRow,
-}) {
-  const {
-    name,
-    price,
-    publish,
-    coverUrl,
-    category,
-    quantity,
-    createdAt,
-    available,
-    inventoryType,
-  } = row;
+export default function UserTableRow({ row, selected, onSelectRow }) {
+  const { amount, date, member, profit, status } = row;
 
   const confirm = useBoolean();
+
+  const quickEdit = useBoolean();
 
   const popover = usePopover();
 
   return (
     <>
       <TableRow hover selected={selected}>
-        <TableCell padding="checkbox">
+        {/* <TableCell padding="checkbox">
           <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
 
         <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar
-            alt={name}
-            src={coverUrl}
-            variant="rounded"
-            sx={{ width: 64, height: 64, mr: 2 }}
-          />
+          <Avatar alt={name} src={avatarUrl} sx={{ mr: 2 }} />
 
           <ListItemText
-            disableTypography
-            primary={
-              <Link
-                noWrap
-                color="inherit"
-                variant="subtitle2"
-                onClick={onViewRow}
-                sx={{ cursor: 'pointer' }}
-              >
-                {name}
-              </Link>
-            }
-            secondary={
-              <Box component="div" sx={{ typography: 'body2', color: 'text.disabled' }}>
-                {category}
-              </Box>
-            }
-          />
-        </TableCell>
-
-        <TableCell>
-          <ListItemText
-            primary={format(new Date(createdAt), 'dd MMM yyyy')}
-            secondary={format(new Date(createdAt), 'p')}
-            primaryTypographyProps={{ typography: 'body2', noWrap: true }}
+            primary={name}
+            secondary={email}
+            primaryTypographyProps={{ typography: 'body2' }}
             secondaryTypographyProps={{
-              mt: 0.5,
               component: 'span',
-              typography: 'caption',
+              color: 'text.disabled',
             }}
           />
         </TableCell>
 
-        <TableCell sx={{ typography: 'caption', color: 'text.secondary' }}>
-          <LinearProgress
-            value={(available * 100) / quantity}
-            variant="determinate"
-            color={
-              (inventoryType === 'out of stock' && 'error') ||
-              (inventoryType === 'low stock' && 'warning') ||
-              'success'
-            }
-            sx={{ mb: 1, height: 6, maxWidth: 80 }}
-          />
-          {!!available && available} {inventoryType}
-        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{phoneNumber}</TableCell>
 
-        <TableCell>{fCurrency(price)}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{company}</TableCell>
+
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{role}</TableCell>
 
         <TableCell>
-          <Label variant="soft" color={(publish === 'published' && 'info') || 'default'}>
-            {publish}
+          <Label
+            variant="soft"
+            color={
+              (status === 'active' && 'success') ||
+              (status === 'pending' && 'warning') ||
+              (status === 'banned' && 'error') ||
+              'default'
+            }
+          >
+            {status}
           </Label>
         </TableCell>
 
-        <TableCell align="right">
-          <IconButton color={popover.open ? 'primary' : 'default'} onClick={popover.onOpen}>
+        <TableCell align="right" sx={{ px: 1, whiteSpace: 'nowrap' }}>
+          <Tooltip title="Quick Edit" placement="top" arrow>
+            <IconButton color={quickEdit.value ? 'inherit' : 'default'} onClick={quickEdit.onTrue}>
+              <Iconify icon="solar:pen-bold" />
+            </IconButton>
+          </Tooltip>
+
+          <IconButton color={popover.open ? 'inherit' : 'default'} onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
+        </TableCell> */}
+
+        <TableCell padding="checkbox">
+          <Checkbox checked={selected} onClick={onSelectRow} />
         </TableCell>
+        {/* <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+          <Avatar alt={name} src={avatarUrl} sx={{ mr: 2 }} />
+
+          <ListItemText
+            primary={name}
+            primaryTypographyProps={{ typography: 'body2' }}
+            secondaryTypographyProps={{
+              component: 'span',
+              color: 'text.disabled',
+            }}
+          />
+        </TableCell> */}
+<TableCell sx={{ whiteSpace: 'nowrap' }}>{status}</TableCell>
+        
+
+        
+
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{member}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{amount}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{profit}</TableCell>
+
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>{date}</TableCell>
       </TableRow>
 
-      <CustomPopover
+      <UserQuickEditForm currentUser={row} open={quickEdit.value} onClose={quickEdit.onFalse} />
+
+      {/* <CustomPopover
         open={popover.open}
         onClose={popover.onClose}
         arrow="right-top"
@@ -134,12 +120,13 @@ export default function ProductTableRow({
       >
         <MenuItem
           onClick={() => {
-            onViewRow();
+            confirm.onTrue();
             popover.onClose();
           }}
+          sx={{ color: 'error.main' }}
         >
-          <Iconify icon="solar:eye-bold" />
-          View
+          <Iconify icon="solar:trash-bin-trash-bold" />
+          Delete
         </MenuItem>
 
         <MenuItem
@@ -151,20 +138,9 @@ export default function ProductTableRow({
           <Iconify icon="solar:pen-bold" />
           Edit
         </MenuItem>
+      </CustomPopover> */}
 
-        <MenuItem
-          onClick={() => {
-            confirm.onTrue();
-            popover.onClose();
-          }}
-          sx={{ color: 'error.main' }}
-        >
-          <Iconify icon="solar:trash-bin-trash-bold" />
-          Delete
-        </MenuItem>
-      </CustomPopover>
-
-      <ConfirmDialog
+      {/* <ConfirmDialog
         open={confirm.value}
         onClose={confirm.onFalse}
         title="Delete"
@@ -174,16 +150,15 @@ export default function ProductTableRow({
             Delete
           </Button>
         }
-      />
+      /> */}
     </>
   );
 }
 
-ProductTableRow.propTypes = {
-  onDeleteRow: PropTypes.func,
-  onEditRow: PropTypes.func,
+UserTableRow.propTypes = {
+  // onDeleteRow: PropTypes.func,
+  // onEditRow: PropTypes.func,
   onSelectRow: PropTypes.func,
-  onViewRow: PropTypes.func,
   row: PropTypes.object,
   selected: PropTypes.bool,
 };

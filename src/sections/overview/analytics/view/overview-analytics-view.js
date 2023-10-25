@@ -1,3 +1,5 @@
+import { useState, useCallback, useEffect } from 'react';
+import axios from 'axios';
 // @mui
 import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
@@ -26,6 +28,33 @@ import AnalyticsConversionRates from '../analytics-conversion-rates';
 
 export default function OverviewAnalyticsView() {
   const settings = useSettingsContext();
+  const [tableData,setTableData]=useState([0,0,0,0]);
+  useEffect(() => {
+    // const authToken =
+    //   'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyX2lkIjoiMSIsInVzZXJfaXAiOiIyMTMuMTQuMTkyLjIwMiIsImVtYWlsIjoiZGVtb3VzZXJAZ21haWwuY29tIiwiand0X2V4cGlyZSI6MTY5NzY3MTQ4Nn0.CkFq8VOTIQ9btY0ryOE__UGnEO6WSlo_S0L6g_ImojnNOyCrAZDHGdJ_E6p68suqJ7D1lIoa2veM0dV4nh1FEC3Qx5HaXPon90nrKR15x743LbAjp7aIvDjFDGoA9u8mSRvW7fZozX-XkS3p6QGPwfLlpyii6HNjLGHBfEWWq6PkE1eQVbEfEHxUnDjvEW3f4C_1I-L2zdzd2B_Ont2WW9idAXmeaZQl2AFlqf19iDb2_eOIuP_TJWjN_DJLPgSMliFwMdILLu8560soTFADibPYHM041Or5kJdJHcioddOBPmv1bFx2c5C0bqj6G0NTAgde5rYtspgP95T8DPK_zNHdMnYEBxL7zPJXTwIkpvoeTc4t3xoSEomyJZeq1lVmb92Xx-7Mkp8BicnIT-9WpuSGhZTrU8qks2uiu5LWL3wbS0RlNSm9v0FkQAaGKNo1r5q3iUI82ZyEPfX9uVZD0iummxCL3emenOQPuKAKTwfS3ISp8Tt9VKDslliRICPd7i-KXq0IZ8vmwTcijUIAhxwaUb3Gyu9yF3s6eejjmKon8_nMC0X6GJjqEZsdSIQaE6I4Txs1LMiY0BtM6Z_modOIxh1YdH1_xUggjKkI4FY8RJEHGrRR9CfeWd48WZzKwELKKFT45VHizNOCw0Cfbo-Je_a0wmWso8Q91ranrLw';
+    
+      const authToken = sessionStorage.getItem('accessToken');
+
+    axios
+      .get('http://194.233.175.49/api/v2/account/stats', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', // Adjust this based on your API's requirement
+          Authorization: authToken,
+        },
+      })
+      .then((response) => {
+        // Perform actions based on the response here
+        console.log('Get Users', response.data);
+
+        // const arrary = response.data;
+        // const ttt = arrary?.map((t) => ({ ...t, id: t.username }));
+        setTableData(response.data);
+      })
+      .catch((error) => {
+        // Handle login failure or errors
+        console.error('Get Users failed:', error);
+      });
+  }, []);
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
@@ -35,22 +64,14 @@ export default function OverviewAnalyticsView() {
           mb: { xs: 3, md: 5 },
         }}
       >
-        Hi, Welcome back 👋
+        Dashboard
       </Typography>
 
       <Grid container spacing={3}>
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
-            title="Weekly Sales"
-            total={714000}
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AnalyticsWidgetSummary
-            title="New Users"
-            total={1352831}
+            title="Users"
+            total={tableData.users}
             color="info"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
           />
@@ -58,8 +79,8 @@ export default function OverviewAnalyticsView() {
 
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
-            title="Item Orders"
-            total={1723315}
+            title="Total Credit"
+            total={tableData.credit}
             color="warning"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
           />
@@ -67,14 +88,31 @@ export default function OverviewAnalyticsView() {
 
         <Grid xs={12} sm={6} md={3}>
           <AnalyticsWidgetSummary
-            title="Bug Reports"
-            total={234}
+            title="Total Balance"
+            total={tableData.balance}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
+          />
+        </Grid>
+
+        <Grid xs={12} sm={6} md={3}>
+          <AnalyticsWidgetSummary
+            title="Invitations"
+            total={tableData.invitees}
             color="error"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
           />
         </Grid>
 
-        <Grid xs={12} md={6} lg={8}>
+        {/* <Grid xs={12} sm={6} md={2.4}>
+          <AnalyticsWidgetSummary
+            title="Points"
+            total={234}
+            color="error"
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
+          />
+        </Grid> */}
+
+        {/* <Grid xs={12} md={6} lg={8}>
           <AnalyticsWebsiteVisits
             title="Website Visits"
             subheader="(+43%) than last year"
@@ -179,7 +217,7 @@ export default function OverviewAnalyticsView() {
 
         <Grid xs={12} md={6} lg={8}>
           <AnalyticsTasks title="Tasks" list={_analyticTasks} />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Container>
   );

@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -23,15 +23,25 @@ import { useAuthContext } from 'src/auth/hooks';
 // components
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import axios from 'axios';
+import { useSnackbar } from 'src/components/snackbar';
+
+import { useParams } from 'react-router-dom';
 
 // ----------------------------------------------------------------------
 
 export default function JwtRegisterView() {
+  const { paramName } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
+
   const { register } = useAuthContext();
 
   const router = useRouter();
 
   const [errorMsg, setErrorMsg] = useState('');
+
+  const [invitingUser, setInvitingUser] = useState('');
+  const [inviting, setInviting] = useState(false);
 
   const searchParams = useSearchParams();
 
@@ -66,15 +76,72 @@ export default function JwtRegisterView() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await register?.(data.email, data.password, data.firstName, data.lastName);
+      console.log(data);
+      // await register?.(data.email, data.password, data.firstName, data.lastName);
+      // router.push(returnTo || PATH_AFTER_LOGIN);
 
-      router.push(returnTo || PATH_AFTER_LOGIN);
+      const formData = new URLSearchParams();
+      formData.append('email', data.email);
+      formData.append('password', data.password);
+      formData.append('firstname', data.firstName);
+      formData.append('lastname', data.lastName);
+      formData.append('inviting', inviting);
+
+      const apiUrl = 'http://194.233.175.49/api/v2/account/register';
+      axios
+        .post(apiUrl, formData, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        })
+        .then((response) => {
+          // Handle a successful login
+          console.log('Sign up successful:', response.data);
+          enqueueSnackbar(response.data.message);
+          const href = paths.auth.jwt.login;
+          router.replace(href);
+          // You can redirect the user or perform other actions here
+          // register?.(data.email, data.password, data.firstName, data.lastName);
+          // router.push(returnTo || PATH_AFTER_LOGIN);
+        })
+        .catch((error) => {
+          // Handle login failure or errors
+          console.error('Sign up failed:', error);
+        });
     } catch (error) {
       console.error(error);
       reset();
       setErrorMsg(typeof error === 'string' ? error : error.message);
     }
   });
+
+  useEffect(() => {
+    const formData = new URLSearchParams();
+    if (paramName !== undefined && paramName !== null) {
+      localStorage.setItem('invitationToken', paramName);
+    }
+    formData.append('token', localStorage.getItem('invitationToken'));
+    try {
+      axios
+        .post('https://wp-services.alfaiptv.org/api/v2/account/inviting', formData, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded', // Adjust this based on your API's requirement
+          },
+        })
+        .then((response) => {
+          // Perform actions based on the response here
+          console.log('Get Users', response.data);
+          setInvitingUser(response.data.result);
+          setInviting(response.data.status);
+        })
+        .catch((error) => {
+          // Handle login failure or errors
+          console.error('Get Result failed:', error);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }, [paramName]);
 
   const renderHead = (
     <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
@@ -139,6 +206,8 @@ export default function JwtRegisterView() {
           }}
         />
 
+        {!!invitingUser && <Alert severity="success">{invitingUser} invited you.</Alert>}
+
         <LoadingButton
           fullWidth
           color="inherit"
@@ -159,7 +228,7 @@ export default function JwtRegisterView() {
 
       {renderForm}
 
-      {renderTerms}
+      {/* {renderTerms} */}
     </>
   );
 }

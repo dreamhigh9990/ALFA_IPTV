@@ -98,27 +98,51 @@ export function AuthProvider({ children }) {
   }, [initialize]);
 
   // LOGIN
-  const login = useCallback(async (email, password) => {
-    const data = {
-      email,
-      password,
-    };
+  const login = useCallback(async (authkey) => {
+    // const data = {
+    //   email,
+    //   password,
+    // };
+    // const formData = new URLSearchParams();
+    // formData.append('email', email);
+    // formData.append('password', password);
 
-    const response = await axios.post(endpoints.auth.login, data);
+    try {
+      // const response = await axios.post(endpoints.auth.login, data);
+      // const response = await axios.post(endpoints.auth.login, formData, {
+      //   headers: {
+      //     'Content-Type': 'application/x-www-form-urlencoded',
+      //   },
+      // });
 
-    const { accessToken, user } = response.data;
+      // console.log('www', response.data);
 
-    setSession(accessToken);
+      // const { accessToken, user } = response.data;
+      const user = authkey;
+      // const user = { email: user,=}
+      const accessToken = authkey.token;
+      setSession(accessToken);
+      // console.log('local', localStorage.getItem('accessToken'));
+      // localStorage.setItem('accessToken', accessToken);
 
-    dispatch({
-      type: 'LOGIN',
-      payload: {
-        user: {
-          ...user,
-          accessToken,
+      dispatch({
+        type: 'LOGIN',
+        payload: {
+          user: {
+            ...user,
+            accessToken,
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      console.error(error);
+      dispatch({
+        type: 'INITIAL',
+        payload: {
+          user: null,
+        },
+      });
+    }
   }, []);
 
   // REGISTER

@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react';
+import isEqual from 'lodash/isEqual';
+import { useState, useCallback, useEffect } from 'react';
+import axios from 'axios';
 // @mui
 import { alpha } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
@@ -14,10 +16,9 @@ import TableContainer from '@mui/material/TableContainer';
 // routes
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
+import { RouterLink } from 'src/routes/components';
 // _mock
-import { _orders, ORDER_STATUS_OPTIONS } from 'src/_mock';
-// utils
-import { fTimestamp } from 'src/utils/format-time';
+import { _userList, _roles, USER_STATUS_OPTIONS } from 'src/_mock';
 // hooks
 import { useBoolean } from 'src/hooks/use-boolean';
 // components
@@ -38,35 +39,34 @@ import {
   TablePaginationCustom,
 } from 'src/components/table';
 //
-import OrderTableRow from '../order-table-row';
-import OrderTableToolbar from '../order-table-toolbar';
-import OrderTableFiltersResult from '../order-table-filters-result';
+import UserTableRow from '../order-table-row';
+import UserTableToolbar from '../../user/user-table-toolbar';
+import UserTableFiltersResult from '../../user/user-table-filters-result';
 
 // ----------------------------------------------------------------------
 
-const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...ORDER_STATUS_OPTIONS];
+const STATUS_OPTIONS = [{ value: 'all', label: 'All' }, ...USER_STATUS_OPTIONS];
 
 const TABLE_HEAD = [
-  { id: 'orderNumber', label: 'Order', width: 116 },
-  { id: 'name', label: 'Customer' },
-  { id: 'createdAt', label: 'Date', width: 140 },
-  { id: 'totalQuantity', label: 'Items', width: 120, align: 'center' },
-  { id: 'totalAmount', label: 'Price', width: 140 },
   { id: 'status', label: 'Status', width: 110 },
-  { id: '', width: 88 },
+  { id: 'payment_id', label: 'payment Id' },
+  { id: 'payment_type', label: 'Payment Type', width: 140 },
+  { id: 'amount', label: 'Amount', width: 120, align: 'center' },
+  { id: 'old_credit', label: 'Old Credit', width: 140 },
+  { id: 'new_credit', label: 'New Credit', width: 116 },
+  { id: 'date', label: 'Date', width: 116 },
 ];
 
 const defaultFilters = {
   name: '',
+  role: [],
   status: 'all',
-  startDate: null,
-  endDate: null,
 };
 
 // ----------------------------------------------------------------------
 
-export default function OrderListView() {
-  const table = useTable({ defaultOrderBy: 'orderNumber' });
+export default function UserListView() {
+  const table = useTable();
 
   const settings = useSettingsContext();
 
@@ -74,20 +74,15 @@ export default function OrderListView() {
 
   const confirm = useBoolean();
 
-  const [tableData, setTableData] = useState(_orders);
+  // const [tableData, setTableData] = useState(_userList);
+  const [tableData, setTableData] = useState([]);
 
   const [filters, setFilters] = useState(defaultFilters);
-
-  const dateError =
-    filters.startDate && filters.endDate
-      ? filters.startDate.getTime() > filters.endDate.getTime()
-      : false;
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(table.order, table.orderBy),
     filters,
-    dateError,
   });
 
   const dataInPage = dataFiltered.slice(
@@ -97,8 +92,7 @@ export default function OrderListView() {
 
   const denseHeight = table.dense ? 52 : 72;
 
-  const canReset =
-    !!filters.name || filters.status !== 'all' || (!!filters.startDate && !!filters.endDate);
+  const canReset = !isEqual(defaultFilters, filters);
 
   const notFound = (!dataFiltered.length && canReset) || !dataFiltered.length;
 
@@ -134,13 +128,9 @@ export default function OrderListView() {
     });
   }, [dataFiltered.length, dataInPage.length, table, tableData]);
 
-  const handleResetFilters = useCallback(() => {
-    setFilters(defaultFilters);
-  }, []);
-
-  const handleViewRow = useCallback(
+  const handleEditRow = useCallback(
     (id) => {
-      router.push(paths.dashboard.order.details(id));
+      router.push(paths.dashboard.user.edit(id));
     },
     [router]
   );
@@ -152,29 +142,62 @@ export default function OrderListView() {
     [handleFilters]
   );
 
+  const handleResetFilters = useCallback(() => {
+    setFilters(defaultFilters);
+  }, []);
+
+  useEffect(() => {
+    // const authToken =
+    //   'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1c2VyX2lkIjoiMSIsInVzZXJfaXAiOiIyMTMuMTQuMTkyLjIwMiIsImVtYWlsIjoiZGVtb3VzZXJAZ21haWwuY29tIiwiand0X2V4cGlyZSI6MTY5NzY3MTQ4Nn0.CkFq8VOTIQ9btY0ryOE__UGnEO6WSlo_S0L6g_ImojnNOyCrAZDHGdJ_E6p68suqJ7D1lIoa2veM0dV4nh1FEC3Qx5HaXPon90nrKR15x743LbAjp7aIvDjFDGoA9u8mSRvW7fZozX-XkS3p6QGPwfLlpyii6HNjLGHBfEWWq6PkE1eQVbEfEHxUnDjvEW3f4C_1I-L2zdzd2B_Ont2WW9idAXmeaZQl2AFlqf19iDb2_eOIuP_TJWjN_DJLPgSMliFwMdILLu8560soTFADibPYHM041Or5kJdJHcioddOBPmv1bFx2c5C0bqj6G0NTAgde5rYtspgP95T8DPK_zNHdMnYEBxL7zPJXTwIkpvoeTc4t3xoSEomyJZeq1lVmb92Xx-7Mkp8BicnIT-9WpuSGhZTrU8qks2uiu5LWL3wbS0RlNSm9v0FkQAaGKNo1r5q3iUI82ZyEPfX9uVZD0iummxCL3emenOQPuKAKTwfS3ISp8Tt9VKDslliRICPd7i-KXq0IZ8vmwTcijUIAhxwaUb3Gyu9yF3s6eejjmKon8_nMC0X6GJjqEZsdSIQaE6I4Txs1LMiY0BtM6Z_modOIxh1YdH1_xUggjKkI4FY8RJEHGrRR9CfeWd48WZzKwELKKFT45VHizNOCw0Cfbo-Je_a0wmWso8Q91ranrLw';
+    const authToken = sessionStorage.getItem('accessToken');
+
+    axios
+      .get('http://194.233.175.49/api/v2/account/credits', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', // Adjust this based on your API's requirement
+          Authorization: authToken,
+        },
+      })
+      .then((response) => {
+        // Perform actions based on the response here
+        console.log('Get Users', response.data);
+        const arrary = response.data;
+        const ttt = arrary?.map((t) => ({ ...t, id: t.payment_id }));
+        setTableData(ttt);
+      })
+      .catch((error) => {
+        // Handle login failure or errors
+        console.error('Get Users failed:', error);
+      });
+  }, []);
+
   return (
     <>
       <Container maxWidth={settings.themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
           heading="List"
           links={[
-            {
-              name: 'Dashboard',
-              href: paths.dashboard.root,
-            },
-            {
-              name: 'Order',
-              href: paths.dashboard.order.root,
-            },
+            { name: 'Dashboard', href: paths.dashboard.root },
+            { name: 'Credits', href: paths.dashboard.credit.root },
             { name: 'List' },
           ]}
+          action={
+            <Button
+              component={RouterLink}
+              href={paths.dashboard.user.new}
+              variant="contained"
+              startIcon={<Iconify icon="mingcute:add-line" />}
+            >
+              New Credit
+            </Button>
+          }
           sx={{
             mb: { xs: 3, md: 5 },
           }}
         />
 
         <Card>
-          <Tabs
+          {/* <Tabs
             value={filters.status}
             onChange={handleFilterStatus}
             sx={{
@@ -194,38 +217,37 @@ export default function OrderListView() {
                       ((tab.value === 'all' || tab.value === filters.status) && 'filled') || 'soft'
                     }
                     color={
-                      (tab.value === 'completed' && 'success') ||
+                      (tab.value === 'active' && 'success') ||
                       (tab.value === 'pending' && 'warning') ||
-                      (tab.value === 'cancelled' && 'error') ||
+                      (tab.value === 'banned' && 'error') ||
                       'default'
                     }
                   >
-                    {tab.value === 'all' && _orders.length}
-                    {tab.value === 'completed' &&
-                      _orders.filter((order) => order.status === 'completed').length}
+                    {tab.value === 'all' && _userList.length}
+                    {tab.value === 'active' &&
+                      _userList.filter((user) => user.status === 'active').length}
 
                     {tab.value === 'pending' &&
-                      _orders.filter((order) => order.status === 'pending').length}
-                    {tab.value === 'cancelled' &&
-                      _orders.filter((order) => order.status === 'cancelled').length}
-                    {tab.value === 'refunded' &&
-                      _orders.filter((order) => order.status === 'refunded').length}
+                      _userList.filter((user) => user.status === 'pending').length}
+                    {tab.value === 'banned' &&
+                      _userList.filter((user) => user.status === 'banned').length}
+                    {tab.value === 'rejected' &&
+                      _userList.filter((user) => user.status === 'rejected').length}
                   </Label>
                 }
               />
             ))}
-          </Tabs>
+          </Tabs> */}
 
-          <OrderTableToolbar
+          <UserTableToolbar
             filters={filters}
             onFilters={handleFilters}
             //
-            canReset={canReset}
-            onResetFilters={handleResetFilters}
+            roleOptions={_roles}
           />
 
           {canReset && (
-            <OrderTableFiltersResult
+            <UserTableFiltersResult
               filters={filters}
               onFilters={handleFilters}
               //
@@ -280,13 +302,15 @@ export default function OrderListView() {
                       table.page * table.rowsPerPage + table.rowsPerPage
                     )
                     .map((row) => (
-                      <OrderTableRow
+                      <UserTableRow
                         key={row.id}
                         row={row}
                         selected={table.selected.includes(row.id)}
-                        onSelectRow={() => table.onSelectRow(row.id)}
+                        onSelectRow={() => {
+                          table.onSelectRow(row.id);
+                        }}
                         onDeleteRow={() => handleDeleteRow(row.id)}
-                        onViewRow={() => handleViewRow(row.id)}
+                        onEditRow={() => handleEditRow(row.id)}
                       />
                     ))}
 
@@ -342,8 +366,8 @@ export default function OrderListView() {
 
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filters, dateError }) {
-  const { status, name, startDate, endDate } = filters;
+function applyFilter({ inputData, comparator, filters }) {
+  const { name, status, role } = filters;
 
   const stabilizedThis = inputData.map((el, index) => [el, index]);
 
@@ -357,25 +381,16 @@ function applyFilter({ inputData, comparator, filters, dateError }) {
 
   if (name) {
     inputData = inputData.filter(
-      (order) =>
-        order.orderNumber.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.name.toLowerCase().indexOf(name.toLowerCase()) !== -1 ||
-        order.customer.email.toLowerCase().indexOf(name.toLowerCase()) !== -1
+      (user) => user.name.toLowerCase().indexOf(name.toLowerCase()) !== -1
     );
   }
 
   if (status !== 'all') {
-    inputData = inputData.filter((order) => order.status === status);
+    inputData = inputData.filter((user) => user.status === status);
   }
 
-  if (!dateError) {
-    if (startDate && endDate) {
-      inputData = inputData.filter(
-        (order) =>
-          fTimestamp(order.createdAt) >= fTimestamp(startDate) &&
-          fTimestamp(order.createdAt) <= fTimestamp(endDate)
-      );
-    }
+  if (role.length) {
+    inputData = inputData.filter((user) => role.includes(user.role));
   }
 
   return inputData;
