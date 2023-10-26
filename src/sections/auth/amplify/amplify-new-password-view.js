@@ -72,10 +72,12 @@ export default function AmplifyNewPasswordView() {
   const values = watch();
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      await newPassword?.(data.email, data.code, data.password);
 
-      router.push(paths.auth.amplify.login);
+    try {
+      console.log("--------->");
+      // await newPassword?.(data.email, data.code, data.password);
+
+      // router.push(paths.auth.amplify.login);
     } catch (error) {
       console.error(error);
     }
@@ -176,7 +178,7 @@ export default function AmplifyNewPasswordView() {
 
   const renderHead = (
     <>
-      <SentIcon sx={{ height: 96 }} />
+      {/* <SentIcon sx={{ height: 96 }} />
 
       <Stack spacing={1} sx={{ my: 5 }}>
         <Typography variant="h3">Request sent successfully!</Typography>
@@ -186,7 +188,7 @@ export default function AmplifyNewPasswordView() {
           <br />
           Please enter the code in below box to verify your email.
         </Typography>
-      </Stack>
+      </Stack> */}
     </>
   );
 

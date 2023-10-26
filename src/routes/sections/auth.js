@@ -21,7 +21,7 @@ const AmplifyForgotPasswordPage = lazy(() => import('src/pages/auth/amplify/forg
 const JwtLoginPage = lazy(() => import('src/pages/auth/jwt/login'));
 const JwtRegisterPage = lazy(() => import('src/pages/auth/jwt/register'));
 const JwtForgotPasswordPage = lazy(() => import('src/pages/auth/jwt/forgot-password'));
-
+const JwtResetPasswordPage = lazy(() => import('src/pages/auth/jwt/reset-password'));
 // FIREBASE
 const FirebaseLoginPage = lazy(() => import('src/pages/auth/firebase/login'));
 const FirebaseRegisterPage = lazy(() => import('src/pages/auth/firebase/register'));
@@ -114,6 +114,14 @@ const authJwt = {
       element: (
         <AuthClassicLayout title="Manage ALFA accounts with ease">
           <JwtForgotPasswordPage />
+        </AuthClassicLayout>
+      ),
+    },
+    {
+      path: 'reset-password/:newToken',
+      element: (
+        <AuthClassicLayout title="Manage ALFA accounts with ease">
+          <JwtResetPasswordPage />
         </AuthClassicLayout>
       ),
     },

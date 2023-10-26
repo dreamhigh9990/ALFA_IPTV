@@ -1,11 +1,13 @@
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+// import { useState } from 'react';
 // @mui
 import LoadingButton from '@mui/lab/LoadingButton';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import Alert from '@mui/material/Alert';
 // routes
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -15,12 +17,16 @@ import { useAuthContext } from 'src/auth/hooks';
 // assets
 import { PasswordIcon } from 'src/assets/icons';
 // components
+import { useSnackbar } from 'src/components/snackbar';
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 
+import axios from 'axios';
 // ----------------------------------------------------------------------
 
 export default function JwtForgotPasswordView() {
+  const { enqueueSnackbar } = useSnackbar();
+  // const [successfulMsg, setSuccessfulMsg] = useState('');
   const { forgotPassword } = useAuthContext();
 
   const router = useRouter();
@@ -44,22 +50,97 @@ export default function JwtForgotPasswordView() {
   } = methods;
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
-      await forgotPassword?.(data.email);
+    // try {
+    //   await forgotPassword?.(data.email);
 
-      const searchParams = new URLSearchParams({
-        email: data.email,
-      }).toString();
+    //   const searchParams = new URLSearchParams({
+    //     email: data.email,
+    //   }).toString();
 
-      const href = `${paths.auth.amplify.newPassword}?${searchParams}`;
-      router.push(href);
-    } catch (error) {
-      console.error(error);
-    }
+    //   const href = `${paths.auth.amplify.newPassword}?${searchParams}`;
+    //   router.push(href);
+    // } catch (error) {
+    //   console.error(error);
+    // }
+
+
+
+    // enqueueSnackbar("HelloWorld");
+
+
+
+
+
+
+    console.log(data.email);
+    const formData = new URLSearchParams();
+    formData.append('email', data.email);
+    // // formData.append('password', data.password);
+    // // console.log('------->',data.email);
+
+    const apiUrl = 'https://wp-services.alfaiptv.org/api/v2/account/recovery/password/reset';
+    axios
+      .post(apiUrl, formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .then((response) => {
+        // // Handle a successful login
+        // console.log('Login successful:', response.status);
+        // // console.log('response', response);
+
+        // const nt = { ...response.data, email: data.email };
+
+        // login?.(nt);
+        // router.push(returnTo || PATH_AFTER_LOGIN);
+        console.log('------->', response.data.developer_notes.token);
+        enqueueSnackbar(response.data.message);
+        // await forgotPassword?.(data.email);
+        // setSuccessfulMsg(response.data.message);
+        // const searchParams = new URLSearchParams({
+        //   email: data.email,
+        //   token: response.data.developer_notes.token,
+        // }).toString();
+        // // forgotPassword?.(data.email,response.data.token);
+        // const href = `${paths.auth.jwt.resetPassword}?${searchParams}`;
+        // router.push(href);
+      })
+      .catch((error) => {
+        // Handle login failure or errors
+        // reset();
+        // console.log('Login failed:', error);
+        // if (error.response !== undefined) {
+        //   setErrorMsg(error.response.data.message);
+        // } else {
+        //   setErrorMsg(typeof error === 'string' ? error : error.message);
+        // }
+      });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   });
 
   const renderForm = (
     <Stack spacing={3} alignItems="center">
+
+{/* {!!successfulMsg && <Alert severity="success">{successfulMsg}</Alert>} */}
+
       <RHFTextField name="email" label="Email address" />
 
       <LoadingButton
