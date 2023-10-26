@@ -187,6 +187,22 @@ export default function JwtForgotPasswordView() {
     </>
   );
 
+  const renderSuccessHead = (
+    <>
+       <Stack spacing={2} sx={{ mb: 5, position: 'relative' }}>
+      <Typography variant="h4">Get started absolutely free</Typography>
+
+      <Stack direction="row" spacing={0.5}>
+        <Typography variant="body2"> Return to  </Typography>
+
+        <Link href={paths.auth.jwt.login} component={RouterLink} variant="subtitle2">
+          Sign in
+        </Link>
+      </Stack>
+    </Stack>
+    </>
+  );
+
   const renderSuccess = (
     <>
       <EmailInboxIcon sx={{ height: 96 }} />
@@ -201,7 +217,8 @@ export default function JwtForgotPasswordView() {
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
-      {renderHead}
+      {/* {renderHead} */}
+      {resetSucceed ? renderSuccessHead : renderHead}
       {resetSucceed ? renderSuccess : renderForm}
       {/* {renderForm} */}
     </FormProvider>
