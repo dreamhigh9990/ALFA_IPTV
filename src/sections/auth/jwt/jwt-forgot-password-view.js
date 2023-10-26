@@ -1,7 +1,8 @@
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-// import { useState } from 'react';
+
+import { useState } from 'react';
 // @mui
 import LoadingButton from '@mui/lab/LoadingButton';
 import Link from '@mui/material/Link';
@@ -15,7 +16,8 @@ import { RouterLink } from 'src/routes/components';
 // auth
 import { useAuthContext } from 'src/auth/hooks';
 // assets
-import { PasswordIcon } from 'src/assets/icons';
+import { PasswordIcon ,EmailInboxIcon} from 'src/assets/icons';
+
 // components
 import { useSnackbar } from 'src/components/snackbar';
 import Iconify from 'src/components/iconify';
@@ -28,7 +30,7 @@ export default function JwtForgotPasswordView() {
   const { enqueueSnackbar } = useSnackbar();
   // const [successfulMsg, setSuccessfulMsg] = useState('');
   const { forgotPassword } = useAuthContext();
-
+  const [resetSucceed, setResetSucceed] = useState(false);
   const router = useRouter();
 
   const ForgotPasswordSchema = Yup.object().shape({
@@ -96,6 +98,7 @@ export default function JwtForgotPasswordView() {
         // router.push(returnTo || PATH_AFTER_LOGIN);
         console.log('------->', response.data.developer_notes.token);
         enqueueSnackbar(response.data.message);
+        setResetSucceed(true);
         // await forgotPassword?.(data.email);
         // setSuccessfulMsg(response.data.message);
         // const searchParams = new URLSearchParams({
@@ -184,11 +187,23 @@ export default function JwtForgotPasswordView() {
     </>
   );
 
+  const renderSuccess = (
+    <>
+      <EmailInboxIcon sx={{ height: 96 }} />
+
+      <Stack spacing={1} sx={{ my: 5 }}>
+        <Typography variant="h4" sx={{ maxWidth: 480, textAlign: 'center' }}>
+          Please check your email!
+        </Typography>
+      </Stack>
+    </>
+  );
+
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       {renderHead}
-
-      {renderForm}
+      {resetSucceed ? renderSuccess : renderForm}
+      {/* {renderForm} */}
     </FormProvider>
   );
 }
