@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 // routes
+import { useSnackbar } from 'src/components/snackbar';
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 import { useSearchParams, useRouter } from 'src/routes/hooks';
@@ -24,10 +25,57 @@ import { useAuthContext } from 'src/auth/hooks';
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
 import axios from 'axios'; // Import Axios
-
+import { useLocation } from 'react-router-dom';
 // ----------------------------------------------------------------------
 
 export default function JwtLoginView() {
+  const { enqueueSnackbar } = useSnackbar();
+  useEffect(() => {
+
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const token = urlParams.get('token');
+   
+    console.log('token------------>',token);
+    
+    if (token) {
+      console.log('Token:', token);
+
+      const formData = new URLSearchParams();
+      formData.append('token', token);
+
+      const apiUrl = 'http://194.233.175.49/api/v2/account/verify';
+      axios
+        .post(apiUrl, formData, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        })
+        .then((response) => {
+          // Handle a successful login
+          console.log('successful:', response.status);
+          enqueueSnackbar(response.data.message);
+          // console.log('response', response);
+  
+          // const nt = { ...response.data, email: data.email };
+  
+          // login?.(nt);
+          // router.push(returnTo || PATH_AFTER_LOGIN);
+        })
+        .catch((error) => {
+          // Handle login failure or errors
+          // reset();
+          console.log('failed:', error);
+  
+          if (error.response !== undefined) {
+            setErrorMsg(error.response.data.message);
+          } else {
+            setErrorMsg(typeof error === 'string' ? error : error.message);
+          }
+        });
+    }
+  }, [enqueueSnackbar]);
+
   const { login } = useAuthContext();
 
   const router = useRouter();
