@@ -118,7 +118,7 @@ const authJwt = {
       ),
     },
     {
-      path: 'reset-password/:newToken',
+      path: 'newPassword',
       element: (
         <AuthClassicLayout title="Manage ALFA accounts with ease">
           <JwtResetPasswordPage />

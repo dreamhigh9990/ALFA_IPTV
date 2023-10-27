@@ -35,7 +35,13 @@ export default function JwtResetPasswordView() {
   
   const { enqueueSnackbar } = useSnackbar();
 
-  const { newToken } = useParams();
+  // const { newToken } = useParams();
+
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const newToken = urlParams.get('token');
+
 
   const { newPassword, forgotPassword } = useAuthContext();
 

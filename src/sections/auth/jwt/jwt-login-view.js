@@ -29,6 +29,7 @@ import { useLocation } from 'react-router-dom';
 // ----------------------------------------------------------------------
 
 export default function JwtLoginView() {
+  const [colorMsg, setColorMsg] = useState('error');
   const { enqueueSnackbar } = useSnackbar();
   useEffect(() => {
 
@@ -68,6 +69,7 @@ export default function JwtLoginView() {
           console.log('failed:', error);
   
           if (error.response !== undefined) {
+            setColorMsg(error.response.data.severity);
             setErrorMsg(error.response.data.message);
           } else {
             setErrorMsg(typeof error === 'string' ? error : error.message);
@@ -163,7 +165,7 @@ export default function JwtLoginView() {
 
   const renderForm = (
     <Stack spacing={2.5}>
-      {!!errorMsg && <Alert severity="error">{errorMsg}</Alert>}
+      {!!errorMsg && <Alert severity={colorMsg}>{errorMsg}</Alert>}
 
       <RHFTextField name="email" label="Email address" />
 
